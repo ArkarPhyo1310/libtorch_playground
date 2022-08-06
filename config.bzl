@@ -1,3 +1,3 @@
-OPENCV_PATH = "D:/Dev_pkgs/opencv/install"
+OPENCV_PATH = "D:/Dev_pkgs/opencv/install" # Add your OPENCV Path Here
 OPENCV_VERSION = "460" # linux 4.6.0
-LIBTORCH_PATH = "D:/Dev_pkgs/pytorch/libtorch"
+LIBTORCH_PATH = "D:/Dev_pkgs/pytorch/libtorch" # Add your LIBTORCH Path here

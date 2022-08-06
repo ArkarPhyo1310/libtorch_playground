@@ -11,5 +11,5 @@
 ### Usage
 
 ```cmd
-bazel run //src:main 
+bazel run //Classification:main 
 ```
