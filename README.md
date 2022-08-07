@@ -6,8 +6,8 @@ This project is aimed for Windows OS. But it should work on Linux environment wi
 
 ### :skull_and_crossbones: Installation :skull_and_crossbones:
 
-1. **Bazel**        - For more [info](https://docs.opencv.org/4.x/df/d65/tutorial_table_of_content_introduction.html).
-2. **OpenCV**       - For more [info](https://bazel.build/install).
+1. **Bazel**        - For more [info](https://bazel.build/install).
+2. **OpenCV**       - For more [info](https://docs.opencv.org/4.x/df/d65/tutorial_table_of_content_introduction.html).
 3. **LibTorch**     - For more [info](https://pytorch.org/cppdocs/installing.html).
 
 For installing these packages, please refer to this [page](https://github.com/ArkarPhyo1310/DevEnv4Windows).
