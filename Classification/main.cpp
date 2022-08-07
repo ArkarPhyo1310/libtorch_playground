@@ -67,26 +67,23 @@ int main(int argc, char *argv[]) {
     bool save = argparser.is_used("--save-folder");
 
     std::vector<std::string> labelList = loadLabels(label);
-
     ImageProcessor imageProcessor(path, 224);
     Predictor predictor(model);
 
     torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch);
-
     predictor.runInference(imgTensor);
     Result output = predictor.getOutput();
-
     imageProcessor.drawText(labelList[output.idx], output.prob);
     cv::Mat image = imageProcessor.getImage();
 
-    std::cout << labelList[output.idx] << std::endl;
-    std::cout << output.prob << std::endl;
+    std::cout << "Label: " << labelList[output.idx] << std::endl;
+    std::cout << "Probability: " << output.prob << std::endl;
 
     if (save) {
         fs::create_directories(savePath);
         fs::path saveImgPath = fs::path(savePath) / "output.png";
         cv::imwrite(saveImgPath.string(), image);
-        printf("Saving Image @ %s ... ", saveImgPath.string());
+        std::cout << "Saving Image @ " << saveImgPath.string();
     }
 
     cv::imshow("Demo", image);

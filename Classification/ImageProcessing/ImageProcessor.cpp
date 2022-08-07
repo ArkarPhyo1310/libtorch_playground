@@ -53,7 +53,7 @@ void ImageProcessor::drawText(const std::string& label, const double prob)
 {
     int baseline = 0;
     char text[256];
-    sprintf(text, "%s: %.1f%%", label, prob * 100);
+    sprintf(text, "%s: %.1f%%", label.c_str(), prob * 100);
     
     cv::Size textSize = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseline);
 
