@@ -13,6 +13,9 @@ Predictor::Predictor(const std::string &modelFile)
     }
 
     std::cout << "Finish loading the model...\n";
+    torch::jit::setGraphExecutorOptimize( false );
+    std::cout << "Warming up model...\n"; 
+    this->model.forward({torch::randn({1, 3, 224, 224})});
 }
 
 Predictor::~Predictor()
