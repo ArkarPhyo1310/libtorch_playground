@@ -1,5 +1,5 @@
 
-load("@classification//:config.bzl", "OPENCV_VERSION")
+load("@libtorchPG//:config.bzl", "OPENCV_VERSION")
 
 OPENCV_LIBS = [
     "calib3d",

@@ -9,7 +9,7 @@
 #include <opencv2/opencv.hpp>
 #include <torch/torch.h>
 
-namespace classification {
+namespace libtorchPG {
 
 enum class CropType {
     Center,

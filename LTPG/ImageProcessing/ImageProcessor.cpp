@@ -1,7 +1,8 @@
 #include <iostream>
 
-#include "Classification/ImageProcessing/ImageProcessor.hpp"
-using namespace classification;
+#include "LTPG/ImageProcessing/ImageProcessor.hpp"
+
+using namespace libtorchPG;
 
 ImageProcessor::ImageProcessor(const std::string &path, const uint32_t imgSize)
     : imgSize(imgSize)
@@ -20,7 +21,7 @@ cv::Mat ImageProcessor::resizeCenter()
     const cv::Rect roi(offsetW, offsetH, cropSize, cropSize);
 
     cv::Mat dstImg = this->origImg(roi);
-    
+
     cv::resize(this->origImg, dstImg, cv::Size(this->imgSize, this->imgSize));
 
     return dstImg;
@@ -41,36 +42,31 @@ torch::Tensor ImageProcessor::process(CropType cType)
     torch::Tensor tensorImg = torch::from_blob(
         dstImg.data,
         {1, dstImg.rows, dstImg.cols, 3},
-        c10::kFloat
-    );
+        c10::kFloat);
     tensorImg = tensorImg.permute({0, 3, 1, 2});
     tensorImg = torch::data::transforms::Normalize<>(mean, std)(tensorImg);
     return tensorImg;
-
 }
 
-void ImageProcessor::drawText(const std::string& label, const double prob) 
+void ImageProcessor::drawText(const std::string &label, const double prob)
 {
     int baseline = 0;
     char text[256];
     sprintf(text, "%s: %.1f%%", label.c_str(), prob * 100);
-    
+
     cv::Size textSize = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseline);
 
     cv::rectangle(
         this->origImg,
         cv::Rect(
             cv::Point(0, 0),
-            cv::Size(textSize.width, textSize.height + baseline)
-        ),
+            cv::Size(textSize.width, textSize.height + baseline)),
         cv::Scalar(0, 0, 0),
-        -1
-    );
+        -1);
     cv::putText(
         this->origImg,
         text,
         cv::Point(0, textSize.height),
-        cv::FONT_HERSHEY_SIMPLEX, 0.5, 
-        cv::Scalar(255, 255, 255), 1
-    );
+        cv::FONT_HERSHEY_SIMPLEX, 0.5,
+        cv::Scalar(255, 255, 255), 1);
 }

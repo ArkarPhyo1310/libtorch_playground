@@ -1,4 +1,4 @@
-# <div align="center"> Libtorch Classification </div>
+# <div align="center"> Libtorch Playground </div>
 
 ## <div align="center">  :snowflake: Inferencing with Pytorch C++ API (libtorch) :snowflake: </div>
 
@@ -26,7 +26,7 @@ Please update the path accordingly.
 ### :zap: Usage :zap:
 
 ```cmd
-bazel run //Classification:main 
+bazel run //LTPG:main 
 ```
 
 Above command will build and run with default image and model (resnet18).
@@ -34,7 +34,7 @@ Above command will build and run with default image and model (resnet18).
 For more command-line options, 
 
 ```
-./bazel-bin/Classification/main.exe --help
+./bazel-bin/LTPG/main.exe --help
 ```
 
 Feedback and suggestions are all welcomed. :v:

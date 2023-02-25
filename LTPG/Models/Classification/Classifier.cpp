@@ -1,29 +1,31 @@
-#include "Classification/Models/Predictor.hpp"
+#include "LTPG/Models/Classification/Classifier.hpp"
 
-using namespace classification;
+using namespace libtorchPG;
 
-Predictor::Predictor(const std::string &modelFile)
+Classifier::Classifier(const std::string &modelFile)
 {
-    try {
+    try
+    {
         this->model = torch::jit::load(modelFile);
         this->model.eval();
-    } catch (const c10::Error& e) {
+    }
+    catch (const c10::Error &e)
+    {
         std::cerr << "Error loading the model!\n";
         abort();
     }
 
     std::cout << "Finish loading the model...\n";
-    torch::jit::setGraphExecutorOptimize( false );
-    std::cout << "Warming up model...\n"; 
+    torch::jit::setGraphExecutorOptimize(false);
+    std::cout << "Warming up model...\n";
     this->model.forward({torch::randn({1, 3, 224, 224})});
 }
 
-Predictor::~Predictor()
+Classifier::~Classifier()
 {
-
 }
 
-void Predictor::runInference(torch::Tensor inputTensor) 
+void Classifier::runInference(torch::Tensor inputTensor)
 {
     std::vector<torch::jit::IValue> input;
     input.push_back(inputTensor);
@@ -36,14 +38,14 @@ void Predictor::runInference(torch::Tensor inputTensor)
     printf("Inference Time: %d ms\n", duration);
 }
 
-Result Predictor::getOutput()
+Result Classifier::getOutput()
 {
     Result data;
     std::tuple<torch::Tensor, torch::Tensor> result = torch::max(this->output, 1);
 
     torch::Tensor prob = std::get<0>(result);
     torch::Tensor index = std::get<1>(result);
-    
+
     data.prob = prob[0].item<float>();
     data.idx = index[0].item<int>();
 

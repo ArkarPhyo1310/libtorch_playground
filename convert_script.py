@@ -12,4 +12,4 @@ traced_script_module = torch.jit.trace(model, example)
 
 # Save the model
 traced_script_module.save(
-    "./Classification/Resources/data/traced_resnet_model.pt")
+    "./LTPG/Resources/data/traced_resnet_model.pt")

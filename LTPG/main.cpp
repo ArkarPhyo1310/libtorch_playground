@@ -10,15 +10,15 @@
 #include <argparse/argparse.hpp>
 
 #include "ImageProcessing/ImageProcessor.hpp"
-#include "Models/Predictor.hpp"
+#include "Models/Classification/Classifier.hpp"
 #include "Utils/File.hpp"
 
-using namespace classification;
+using namespace libtorchPG;
 namespace fs = std::filesystem;
 
 argparse::ArgumentParser getOpts(int argc, char *argv[])
 {
-    argparse::ArgumentParser program("Image Classification with LibTorch");
+    argparse::ArgumentParser program("LibTorch Playground");
 
     fs::path exePath = getExePath(argv[0]);
     fs::path imagePath = getDefault(exePath, "cat.jpg");
@@ -29,7 +29,7 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
         .default_value(imagePath.string())
         .required()
         .help("Specify the image path.");
-    
+
     program.add_argument("-m", "--model")
         .default_value(modelPath.string())
         .required()
@@ -44,9 +44,12 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
         .required()
         .help("Specify the save path.");
 
-    try {
+    try
+    {
         program.parse_args(argc, argv);
-    } catch (const std::runtime_error& err) {
+    }
+    catch (const std::runtime_error &err)
+    {
         std::cerr << err.what() << std::endl;
         std::cerr << program;
         std::exit(1);
@@ -54,8 +57,8 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
     return program;
 }
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
     argparse::ArgumentParser argparser = getOpts(argc, argv);
 
@@ -68,7 +71,7 @@ int main(int argc, char *argv[]) {
 
     std::vector<std::string> labelList = loadLabels(label);
     ImageProcessor imageProcessor(path, 224);
-    Predictor predictor(model);
+    Classifier predictor(model);
 
     torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch);
     predictor.runInference(imgTensor);
@@ -79,7 +82,8 @@ int main(int argc, char *argv[]) {
     std::cout << "Label: " << labelList[output.idx] << std::endl;
     std::cout << "Probability: " << output.prob << std::endl;
 
-    if (save) {
+    if (save)
+    {
         fs::create_directories(savePath);
         fs::path saveImgPath = fs::path(savePath) / "output.png";
         cv::imwrite(saveImgPath.string(), image);
@@ -87,7 +91,8 @@ int main(int argc, char *argv[]) {
     }
 
     cv::imshow("Demo", image);
-    if (cv::waitKey(0) > 0) {
+    if (cv::waitKey(0) > 0)
+    {
         cv::destroyAllWindows();
     }
 
