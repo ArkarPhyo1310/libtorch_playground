@@ -1,4 +1,3 @@
-
 load("@libtorchPG//:config.bzl", "OPENCV_VERSION")
 
 OPENCV_LIBS = [
@@ -35,16 +34,17 @@ cc_library(
     name="opencv",
     srcs=select({
         "@bazel_tools//src/conditions:windows": glob(["lib/*.lib"]),
-        "//conditions:default": glob(["lib/*.so"])  
+        "@bazel_tools//src/conditions:linux": glob(["lib/*.so*"])  
     }),
     hdrs=select({
-        "@bazel_tools//src/conditions:windows": glob(["include/**/*.hpp", "include/**/*.h"]),
-        "//conditions:default": glob(["include/opencv4/**"])
+        "@bazel_tools//src/conditions:windows": glob(["include/**/*.h*"]),
+        "@bazel_tools//src/conditions:linux": glob(["include/opencv4/**"])
     }),
     deps=select({
         "@bazel_tools//src/conditions:windows": OPENCV_LIBS,
-        "//conditions:default": []
+        "@bazel_tools//src/conditions:linux": []
     }),
-    includes=["include"],
-    visibility=["//visibility:public"]
+    includes=["include", "include/opencv4"],
+    visibility=["//visibility:public"],
+    linkstatic = 1,
 )

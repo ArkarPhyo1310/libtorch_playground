@@ -26,7 +26,7 @@ cc_library(
     name="libtorch",
     srcs=select({
         "@bazel_tools//src/conditions:windows": glob(["lib/*.lib"]),
-        "//conditions:default": glob(["lib/*.so"])  
+        "@bazel_tools//src/conditions:linux": glob(["lib/lib*.so*"], exclude=["lib/libtorch_python.so", "lib/libnnapi_backend.so"])  
     }),
     hdrs=glob([
             "include/**",
@@ -40,11 +40,12 @@ cc_library(
         ]),
     deps=select({
         "@bazel_tools//src/conditions:windows": TORCH_LIBS,
-        "//conditions:default": []
+        "@bazel_tools//src/conditions:linux": []
     }), 
     includes=[
         "include",
         "include/torch/csrc/api/include",
     ],
+    linkstatic = 1,
     visibility=["//visibility:public"],
 )
