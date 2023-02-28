@@ -12,6 +12,9 @@ This project is aimed for Windows OS. But it should work on Linux environment wi
 
 For installing these packages, please refer to this [page](https://github.com/ArkarPhyo1310/DevEnv4Windows).
 
+>Note: If you encounter "undefiend error" in linux, try downloading the nightly version of the libtorch without pre-compile.
+>Here is the link to download. [https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-shared-with-deps-latest.zip]
+
 ### :clipboard: Configuration :clipboard:
 
 Current **config.bzl**.
@@ -33,6 +36,12 @@ Above command will build and run with default image and model (resnet18).
 
 For more command-line options, 
 
+For Linux,
+```
+bazel-bin/LTPG/main --help
+```
+
+For Windows,
 ```
 ./bazel-bin/LTPG/main.exe --help
 ```

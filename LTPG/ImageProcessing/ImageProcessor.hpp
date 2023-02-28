@@ -1,5 +1,5 @@
 #ifndef PREPROCESSING_H
-#define PREORICESSING_H
+#define PREPROCESSING_H
 
 #include <cstdint>
 #include <string>
