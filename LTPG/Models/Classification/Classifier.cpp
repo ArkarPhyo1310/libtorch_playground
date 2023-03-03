@@ -38,9 +38,9 @@ void Classifier::runInference(torch::Tensor inputTensor)
     printf("Inference Time: %d ms\n", duration);
 }
 
-Result Classifier::getOutput()
+ClsResult Classifier::getOutput()
 {
-    Result data;
+    ClsResult data;
     std::tuple<torch::Tensor, torch::Tensor> result = torch::max(this->output, 1);
 
     torch::Tensor prob = std::get<0>(result);

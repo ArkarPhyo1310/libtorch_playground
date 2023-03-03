@@ -12,10 +12,9 @@
 namespace libtorchPG {
 
 enum class CropType {
-    Center,
+    CenterCut,
     Stretch,
-    Cut,
-    Expand,
+    LetterBox,
 };
 
 class ImageProcessor {
@@ -27,13 +26,11 @@ private:
     const std::vector<double> mean = {0.485, 0.456, 0.406};
     const std::vector<double> std = {0.229, 0.224, 0.225};
     
-    cv::Mat resizeCenter();
+    cv::Mat resizeCenterCut();
 
     cv::Mat resizeStretch();
 
-    cv::Mat resizeCut();
-
-    cv::Mat resizeExpand();
+    cv::Mat resizeLetterBox();
 
 public:
 
@@ -45,7 +42,7 @@ public:
         return this->origImg;
     }
 
-    torch::Tensor process(CropType type);
+    torch::Tensor process(CropType type, bool normalize);
 
     void drawText(const std::string& label, const double prob);
 };

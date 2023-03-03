@@ -19,6 +19,7 @@ cc_binary(
     deps = [
         "//LTPG/ImageProcessing:ImageProcessor",
         "//LTPG/Models/Classification:Classifier",
+        "//LTPG/Models/Detection:Detector",
         "//LTPG/Utils:File",
         "@lib_ARGPARSE//:argparse",
         "@lib_CV//:opencv",

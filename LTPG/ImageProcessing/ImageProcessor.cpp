@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 
 #include "LTPG/ImageProcessing/ImageProcessor.hpp"
@@ -10,19 +11,32 @@ ImageProcessor::ImageProcessor(const std::string &path, const uint32_t imgSize)
     this->origImg = cv::imread(path);
 }
 
-cv::Mat ImageProcessor::resizeCenter()
+cv::Mat ImageProcessor::resizeLetterBox()
 {
-    const uint32_t rows = this->origImg.rows;
-    const uint32_t cols = this->origImg.cols;
+    cv::Mat dstImg;
 
-    const uint32_t cropSize = std::min(rows, cols);
-    const uint32_t offsetW = (cols - cropSize) / 2;
-    const uint32_t offsetH = (rows - cropSize) / 2;
-    const cv::Rect roi(offsetW, offsetH, cropSize, cropSize);
+    std::vector<int> oldShape{this->origImg.cols, this->origImg.rows};
+    std::vector<int> newShape{this->imgSize, this->imgSize};
 
-    cv::Mat dstImg = this->origImg(roi);
+    float scale = std::min(newShape[0] / oldShape[0], newShape[1] / oldShape[1] );
 
-    cv::resize(this->origImg, dstImg, cv::Size(this->imgSize, this->imgSize));
+    int unpadW = static_cast<int>(oldShape[1] * scale);
+    int unpadH = static_cast<int>(oldShape[0] * scale);
+
+    int dw = newShape[1] - unpadW;
+    int dh = newShape[1] - unpadH;
+
+    dw = (dw % 32) / 2;
+    dh = (dh % 32) / 2;
+
+    cv::resize(this->origImg, dstImg, cv::Size(unpadW, unpadH), 0, 0, cv::INTER_LINEAR);
+
+    int top = static_cast<int>(dh - 0.1);
+    int bottom = static_cast<int>(dh + 0.1);
+    int left = static_cast<int>(dw - 0.1);
+    int right = static_cast<int>(dh + 0.1);
+
+    cv::copyMakeBorder(this->origImg, dstImg, top, bottom, left, right, cv::BORDER_CONSTANT, cv::Scalar(114, 114, 114));
 
     return dstImg;
 }
@@ -34,9 +48,45 @@ cv::Mat ImageProcessor::resizeStretch()
     return dstImg;
 }
 
-torch::Tensor ImageProcessor::process(CropType cType)
+cv::Mat ImageProcessor::resizeCenterCut()
 {
-    cv::Mat dstImg = (cType == CropType::Center) ? this->resizeCenter() : this->resizeStretch();
+    cv::Mat dstImg = cv::Mat::zeros(this->imgSize, this->imgSize, CV_8UC3);
+
+    float aspect_ratio_src = static_cast<float>(this->origImg.cols) / this->origImg.rows;
+    float aspect_ratio_dst = static_cast<float>(dstImg.cols) / dstImg.rows;
+    cv::Rect target_rect(0, 0, this->origImg.cols, this->origImg.rows);
+    if (aspect_ratio_src > aspect_ratio_dst) {
+        target_rect.width = static_cast<int32_t>(this->origImg.rows * aspect_ratio_dst);
+        target_rect.x = (this->origImg.cols - target_rect.width) / 2;
+    } else {
+        target_rect.height = static_cast<int32_t>(this->origImg.cols / aspect_ratio_dst);
+        target_rect.y = (this->origImg.rows - target_rect.height) / 2;
+    }
+    cv::Mat target = this->origImg(target_rect);
+    cv::resize(target, dstImg, dstImg.size(), 0, 0, cv::INTER_LINEAR);
+
+    return dstImg;
+}
+
+torch::Tensor ImageProcessor::process(CropType cType, bool normalize)
+{
+    cv::Mat dstImg;
+
+    switch (cType) {
+        case CropType::CenterCut:
+            dstImg = this->resizeCenterCut();
+            break;
+        case CropType::Stretch:
+            dstImg = this->resizeStretch();
+            break;
+        case CropType::LetterBox:
+            dstImg = this->resizeLetterBox();
+            break;
+    };
+
+    cv::imshow("S", dstImg);
+    cv::waitKey(0);
+
     cv::cvtColor(dstImg, dstImg, cv::COLOR_BGR2RGB);
     dstImg.convertTo(dstImg, CV_32FC3, 1 / 255.0);
     torch::Tensor tensorImg = torch::from_blob(
@@ -44,7 +94,8 @@ torch::Tensor ImageProcessor::process(CropType cType)
         {1, dstImg.rows, dstImg.cols, 3},
         c10::kFloat);
     tensorImg = tensorImg.permute({0, 3, 1, 2});
-    tensorImg = torch::data::transforms::Normalize<>(mean, std)(tensorImg);
+    if (normalize)
+        tensorImg = torch::data::transforms::Normalize<>(mean, std)(tensorImg);
     return tensorImg;
 }
 

@@ -11,6 +11,7 @@
 
 #include "ImageProcessing/ImageProcessor.hpp"
 #include "Models/Classification/Classifier.hpp"
+#include "Models/Detection/Detector.hpp"
 #include "Utils/File.hpp"
 
 using namespace libtorchPG;
@@ -21,8 +22,8 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
     argparse::ArgumentParser program("LibTorch Playground");
 
     fs::path exePath = getExePath(argv[0]);
-    fs::path imagePath = getDefault(exePath, "cat.jpg");
-    fs::path modelPath = getDefault(exePath, "traced_resnet_model.pt");
+    fs::path imagePath = getDefault(exePath, "/home/arkar/Projects/github/yolov5/data/images/zidane.jpg");
+    fs::path modelPath = getDefault(exePath, "resnet.torchscript");
     fs::path labelPath = getDefault(exePath, "labels.txt");
 
     program.add_argument("-i", "--image")
@@ -71,16 +72,23 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> labelList = loadLabels(label);
     ImageProcessor imageProcessor(path, 224);
-    Classifier predictor(model);
+    Classifier clsPredictor(model);
+    torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch, true);
 
-    torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch);
-    predictor.runInference(imgTensor);
-    Result output = predictor.getOutput();
+    // Classification Part
+    clsPredictor.runInference(imgTensor);
+    ClsResult output = clsPredictor.getOutput();
     imageProcessor.drawText(labelList[output.idx], output.prob);
     cv::Mat image = imageProcessor.getImage();
 
     std::cout << "Label: " << labelList[output.idx] << std::endl;
     std::cout << "Probability: " << output.prob << std::endl;
+
+    // Detection Part
+    Detector detPredictor("/home/arkar/Projects/github/libtorch_playground/LTPG/Resources/data/yolov5s.torchscript");
+    ImageProcessor imageDetProcessor(path, 640);
+    torch::Tensor imgDetTensor = imageDetProcessor.process(CropType::LetterBox, false);
+    detPredictor.runInference(imgDetTensor);
 
     if (save)
     {

@@ -11,7 +11,7 @@
 namespace libtorchPG
 {
 
-    struct Result
+    struct ClsResult
     {
         int idx;
         float prob;
@@ -27,7 +27,7 @@ namespace libtorchPG
 
         void runInference(torch::Tensor input);
 
-        Result getOutput();
+        ClsResult getOutput();
 
     private:
         torch::jit::script::Module model;
