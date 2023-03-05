@@ -11,7 +11,8 @@
 
 #include "ImageProcessing/ImageProcessor.hpp"
 #include "Models/Classification/Classifier.hpp"
-#include "Models/Detection/Detector.hpp"
+#include "Models/Detection/Detector/Detector.hpp"
+#include "Models/Detection/Utils/Utils.hpp"
 #include "Utils/File.hpp"
 
 using namespace libtorchPG;
@@ -22,7 +23,7 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
     argparse::ArgumentParser program("LibTorch Playground");
 
     fs::path exePath = getExePath(argv[0]);
-    fs::path imagePath = getDefault(exePath, "/home/arkar/Projects/github/yolov5/data/images/zidane.jpg");
+    fs::path imagePath = getDefault(exePath, "D:\\Personal_Projects\\yolov5\\data\\images\\zidane.jpg");
     fs::path modelPath = getDefault(exePath, "resnet.torchscript");
     fs::path labelPath = getDefault(exePath, "labels.txt");
 
@@ -72,22 +73,27 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> labelList = loadLabels(label);
     ImageProcessor imageProcessor(path, 224);
-    Classifier clsPredictor(model);
+    // Classifier clsPredictor(model);
     torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch, true);
 
     // Classification Part
-    clsPredictor.runInference(imgTensor);
-    ClsResult output = clsPredictor.getOutput();
-    imageProcessor.drawText(labelList[output.idx], output.prob);
+    // clsPredictor.runInference(imgTensor);
+    // ClsResult output = clsPredictor.getOutput();
+    // imageProcessor.drawText(labelList[output.idx], output.prob);
     cv::Mat image = imageProcessor.getImage();
 
-    std::cout << "Label: " << labelList[output.idx] << std::endl;
-    std::cout << "Probability: " << output.prob << std::endl;
+    // std::cout << "Label: " << labelList[output.idx] << std::endl;
+    // std::cout << "Probability: " << output.prob << std::endl;
 
     // Detection Part
-    Detector detPredictor("/home/arkar/Projects/github/libtorch_playground/LTPG/Resources/data/yolov5s.torchscript");
     ImageProcessor imageDetProcessor(path, 640);
     torch::Tensor imgDetTensor = imageDetProcessor.process(CropType::LetterBox, false);
+    Detector detPredictor(
+        "D:\\Personal_Projects\\yolov5\\yolov5s.torchscript",
+        ModelName::YOLOV5,
+        cv::Size(640, 640),
+        image.size());
+
     detPredictor.runInference(imgDetTensor);
 
     if (save)

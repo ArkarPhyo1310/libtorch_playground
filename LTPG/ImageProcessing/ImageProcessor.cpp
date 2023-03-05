@@ -15,28 +15,31 @@ cv::Mat ImageProcessor::resizeLetterBox()
 {
     cv::Mat dstImg;
 
-    std::vector<int> oldShape{this->origImg.cols, this->origImg.rows};
-    std::vector<int> newShape{this->imgSize, this->imgSize};
+    std::vector<float> oldShape{static_cast<float>(this->origImg.rows), static_cast<float>(this->origImg.cols)};
+    std::vector<float> newShape{static_cast<float>(this->imgSize), static_cast<float>(this->imgSize)};
 
-    float scale = std::min(newShape[0] / oldShape[0], newShape[1] / oldShape[1] );
+    float scale = std::min(newShape[0] / oldShape[0], newShape[1] / oldShape[1]);
 
     int unpadW = static_cast<int>(oldShape[1] * scale);
     int unpadH = static_cast<int>(oldShape[0] * scale);
 
     int dw = newShape[1] - unpadW;
-    int dh = newShape[1] - unpadH;
+    int dh = newShape[0] - unpadH;
 
-    dw = (dw % 32) / 2;
-    dh = (dh % 32) / 2;
+    // dw = (dw % 32) / 2;
+    // dh = (dh % 32) / 2;
+
+    dw /= 2;
+    dh /= 2;
 
     cv::resize(this->origImg, dstImg, cv::Size(unpadW, unpadH), 0, 0, cv::INTER_LINEAR);
 
-    int top = static_cast<int>(dh - 0.1);
-    int bottom = static_cast<int>(dh + 0.1);
-    int left = static_cast<int>(dw - 0.1);
-    int right = static_cast<int>(dh + 0.1);
+    int top = static_cast<int>(dh);
+    int bottom = static_cast<int>(dh);
+    int left = static_cast<int>(dw);
+    int right = static_cast<int>(dw);
 
-    cv::copyMakeBorder(this->origImg, dstImg, top, bottom, left, right, cv::BORDER_CONSTANT, cv::Scalar(114, 114, 114));
+    cv::copyMakeBorder(dstImg, dstImg, top, bottom, left, right, cv::BORDER_CONSTANT, cv::Scalar(114, 114, 114));
 
     return dstImg;
 }
@@ -55,10 +58,13 @@ cv::Mat ImageProcessor::resizeCenterCut()
     float aspect_ratio_src = static_cast<float>(this->origImg.cols) / this->origImg.rows;
     float aspect_ratio_dst = static_cast<float>(dstImg.cols) / dstImg.rows;
     cv::Rect target_rect(0, 0, this->origImg.cols, this->origImg.rows);
-    if (aspect_ratio_src > aspect_ratio_dst) {
+    if (aspect_ratio_src > aspect_ratio_dst)
+    {
         target_rect.width = static_cast<int32_t>(this->origImg.rows * aspect_ratio_dst);
         target_rect.x = (this->origImg.cols - target_rect.width) / 2;
-    } else {
+    }
+    else
+    {
         target_rect.height = static_cast<int32_t>(this->origImg.cols / aspect_ratio_dst);
         target_rect.y = (this->origImg.rows - target_rect.height) / 2;
     }
@@ -72,20 +78,18 @@ torch::Tensor ImageProcessor::process(CropType cType, bool normalize)
 {
     cv::Mat dstImg;
 
-    switch (cType) {
-        case CropType::CenterCut:
-            dstImg = this->resizeCenterCut();
-            break;
-        case CropType::Stretch:
-            dstImg = this->resizeStretch();
-            break;
-        case CropType::LetterBox:
-            dstImg = this->resizeLetterBox();
-            break;
+    switch (cType)
+    {
+    case CropType::CenterCut:
+        dstImg = this->resizeCenterCut();
+        break;
+    case CropType::Stretch:
+        dstImg = this->resizeStretch();
+        break;
+    case CropType::LetterBox:
+        dstImg = this->resizeLetterBox();
+        break;
     };
-
-    cv::imshow("S", dstImg);
-    cv::waitKey(0);
 
     cv::cvtColor(dstImg, dstImg, cv::COLOR_BGR2RGB);
     dstImg.convertTo(dstImg, CV_32FC3, 1 / 255.0);
@@ -96,7 +100,7 @@ torch::Tensor ImageProcessor::process(CropType cType, bool normalize)
     tensorImg = tensorImg.permute({0, 3, 1, 2});
     if (normalize)
         tensorImg = torch::data::transforms::Normalize<>(mean, std)(tensorImg);
-    return tensorImg;
+    return tensorImg.contiguous();
 }
 
 void ImageProcessor::drawText(const std::string &label, const double prob)
