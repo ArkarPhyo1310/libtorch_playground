@@ -4,11 +4,28 @@
 #include <vector>
 
 #include <torch/torch.h>
-
-#include "LTPG/Models/Detection/Utils/Utils.hpp"
+#include "LTPG/Utils/Convert.hpp"
 
 namespace libtorchPG
 {
+    struct DetResult
+    {
+        float x1;
+        float y1;
+        float x2;
+        float y2;
+        int idx;
+        float score;
+    };
+
+    enum ModelName
+    {
+        YOLOV5,
+        YOLOv7,
+        YOLOv8,
+        YOLOX,
+    };
+
     class AbstractPostProcessor
     {
     protected:

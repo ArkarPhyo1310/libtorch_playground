@@ -10,7 +10,7 @@
 
 #include "LTPG/Models/Detection/PostProcessor/Abstract/Abstract.hpp"
 #include "LTPG/Models/Detection/PostProcessor/YoloV5/PostProcess.hpp"
-#include "LTPG/Models/Detection/Utils/Utils.hpp"
+#include "LTPG/Utils/Convert.hpp"
 
 namespace libtorchPG
 {

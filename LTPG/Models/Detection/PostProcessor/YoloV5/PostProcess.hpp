@@ -8,7 +8,6 @@
 #include <torch/torch.h>
 
 #include "LTPG/Models/Detection/PostProcessor/Abstract/Abstract.hpp"
-#include "LTPG/Models/Detection/Utils/Utils.hpp"
 
 namespace libtorchPG
 {
@@ -31,11 +30,10 @@ namespace libtorchPG
             this->scale = std::min(toFloat(newShape.height) / toFloat(oldShape.height),
                                    toFloat(newShape.width) / toFloat(oldShape.width));
 
-            int w = static_cast<int>((newShape.width - oldShape.width * this->scale) / 2);
-            int h = static_cast<int>((newShape.height - oldShape.height * this->scale) / 2);
+            int w = toInt((newShape.width - oldShape.width * this->scale) / 2);
+            int h = toInt((newShape.height - oldShape.height * this->scale) / 2);
 
             this->pad = {w, h};
-            std::cout << scale << " " << w << " " << h << std::endl;
         };
 
         ~YOLOV5PostProcessor(){};

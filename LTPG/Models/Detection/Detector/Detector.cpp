@@ -57,16 +57,5 @@ std::vector<DetResult> Detector::runInference(torch::Tensor inputTensor)
 
     std::vector<DetResult> res = this->postProcessor->postProcess(output);
 
-    for (auto i : res)
-    {
-        std::cout << "Result: " << std::endl;
-        std::cout << "\tx1: " << i.x1 << std::endl;
-        std::cout << "\ty1: " << i.y1 << std::endl;
-        std::cout << "\tx2: " << i.x2 << std::endl;
-        std::cout << "\ty2: " << i.y2 << std::endl;
-        std::cout << "\tscore: " << i.score << std::endl;
-        std::cout << "\tidx: " << i.idx << std::endl;
-    }
-
     return res;
 }

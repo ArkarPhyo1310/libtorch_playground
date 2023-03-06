@@ -9,43 +9,60 @@
 #include <opencv2/opencv.hpp>
 #include <torch/torch.h>
 
-namespace libtorchPG {
+#include "LTPG/Utils/Convert.hpp"
 
-enum class CropType {
-    CenterCut,
-    Stretch,
-    LetterBox,
-};
+namespace libtorchPG
+{
 
-class ImageProcessor {
+    enum class CropType
+    {
+        CenterCut,
+        Stretch,
+        LetterBox,
+    };
 
-private: 
+    class ImageProcessor
+    {
 
-    cv::Mat origImg;
-    const uint16_t imgSize;
-    const std::vector<double> mean = {0.485, 0.456, 0.406};
-    const std::vector<double> std = {0.229, 0.224, 0.225};
-    
-    cv::Mat resizeCenterCut();
+    private:
+        cv::Mat origImg;
+        std::vector<cv::Scalar> colorList;
 
-    cv::Mat resizeStretch();
+        const uint16_t imgSize;
+        const std::vector<double> mean = {0.485, 0.456, 0.406};
+        const std::vector<double> std = {0.229, 0.224, 0.225};
 
-    cv::Mat resizeLetterBox();
+        cv::Mat resizeCenterCut();
 
-public:
+        cv::Mat resizeStretch();
 
-    ImageProcessor(const std::string &path, const uint32_t imgSize);
+        cv::Mat resizeLetterBox();
 
-    ~ImageProcessor() {};
+        void generateColor();
 
-    cv::Mat getImage() {
-        return this->origImg;
-    }
+    public:
+        ImageProcessor(const std::string &path, const uint32_t imgSize);
 
-    torch::Tensor process(CropType type, bool normalize);
+        ~ImageProcessor(){};
 
-    void drawText(const std::string& label, const double prob);
-};
+        cv::Mat getImage()
+        {
+            return this->origImg;
+        }
+
+        cv::Size getSize()
+        {
+            return this->origImg.size();
+        }
+
+        torch::Tensor process(CropType type, bool normalize);
+
+        void drawText(const std::string &label, const double prob);
+
+        void drawBbox(const cv::Rect &rect, const int idx, const double prob, std::vector<std::string> &labelList);
+
+        void drawFPS();
+    };
 
 }
 

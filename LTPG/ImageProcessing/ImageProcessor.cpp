@@ -9,6 +9,7 @@ ImageProcessor::ImageProcessor(const std::string &path, const uint32_t imgSize)
     : imgSize(imgSize)
 {
     this->origImg = cv::imread(path);
+    this->generateColor();
 }
 
 cv::Mat ImageProcessor::resizeLetterBox()
@@ -20,24 +21,21 @@ cv::Mat ImageProcessor::resizeLetterBox()
 
     float scale = std::min(newShape[0] / oldShape[0], newShape[1] / oldShape[1]);
 
-    int unpadW = static_cast<int>(oldShape[1] * scale);
-    int unpadH = static_cast<int>(oldShape[0] * scale);
+    int unpadW = toInt(oldShape[1] * scale);
+    int unpadH = toInt(oldShape[0] * scale);
 
     int dw = newShape[1] - unpadW;
     int dh = newShape[0] - unpadH;
-
-    // dw = (dw % 32) / 2;
-    // dh = (dh % 32) / 2;
 
     dw /= 2;
     dh /= 2;
 
     cv::resize(this->origImg, dstImg, cv::Size(unpadW, unpadH), 0, 0, cv::INTER_LINEAR);
 
-    int top = static_cast<int>(dh);
-    int bottom = static_cast<int>(dh);
-    int left = static_cast<int>(dw);
-    int right = static_cast<int>(dw);
+    int top = toInt(dh);
+    int bottom = toInt(dh);
+    int left = toInt(dw);
+    int right = toInt(dw);
 
     cv::copyMakeBorder(dstImg, dstImg, top, bottom, left, right, cv::BORDER_CONSTANT, cv::Scalar(114, 114, 114));
 
@@ -103,6 +101,16 @@ torch::Tensor ImageProcessor::process(CropType cType, bool normalize)
     return tensorImg.contiguous();
 }
 
+void ImageProcessor::generateColor()
+{
+    cv::RNG range(12345);
+    for (int i = 0; i < 100; i++)
+    {
+        cv::Scalar bboxColor = cv::Scalar(range.uniform(0, 255), range.uniform(0, 255), range.uniform(0, 255));
+        this->colorList.push_back(bboxColor);
+    }
+}
+
 void ImageProcessor::drawText(const std::string &label, const double prob)
 {
     int baseline = 0;
@@ -124,4 +132,32 @@ void ImageProcessor::drawText(const std::string &label, const double prob)
         cv::Point(0, textSize.height),
         cv::FONT_HERSHEY_SIMPLEX, 0.5,
         cv::Scalar(255, 255, 255), 1);
+}
+
+void ImageProcessor::drawBbox(const cv::Rect &rect, const int idx, const double prob, std::vector<std::string> &labelList)
+{
+    int baseline = 0;
+    char text[256];
+
+    std::string label = (labelList.size() > 0) ? labelList[idx] : std::to_string(idx);
+    sprintf(text, "%s: %.1f%%", label.c_str(), prob * 100);
+
+    cv::Size textSize = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseline);
+
+    cv::Scalar bboxColor = this->colorList[idx];
+    cv::Scalar textColor = (bboxColor[0] + bboxColor[1] + bboxColor[2]) / 3 > 128 ? cv::Scalar(0, 0, 0) : cv::Scalar(255, 255, 255);
+
+    cv::rectangle(this->origImg,
+                  rect, bboxColor, 2);
+    cv::rectangle(this->origImg,
+                  cv::Rect(
+                      rect.tl(),
+                      cv::Size(textSize.width + baseline, textSize.height + baseline)),
+                  bboxColor,
+                  -1);
+    cv::putText(this->origImg,
+                text,
+                cv::Point(rect.tl().x + 2, rect.tl().y + textSize.height),
+                cv::FONT_HERSHEY_SIMPLEX,
+                0.5, textColor);
 }

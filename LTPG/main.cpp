@@ -12,7 +12,7 @@
 #include "ImageProcessing/ImageProcessor.hpp"
 #include "Models/Classification/Classifier.hpp"
 #include "Models/Detection/Detector/Detector.hpp"
-#include "Models/Detection/Utils/Utils.hpp"
+#include "Utils/Convert.hpp"
 #include "Utils/File.hpp"
 
 using namespace libtorchPG;
@@ -70,18 +70,16 @@ int main(int argc, char *argv[])
     std::string savePath = argparser.get<std::string>("--save-folder");
 
     bool save = argparser.is_used("--save-folder");
-
-    std::vector<std::string> labelList = loadLabels(label);
-    ImageProcessor imageProcessor(path, 224);
-    // Classifier clsPredictor(model);
-    torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch, true);
-
+    
     // Classification Part
+    // std::vector<std::string> labelList = loadLabels(label);
+    // ImageProcessor imageProcessor(path, 224);
+    // Classifier clsPredictor(model);
+    // torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch, true);
     // clsPredictor.runInference(imgTensor);
     // ClsResult output = clsPredictor.getOutput();
     // imageProcessor.drawText(labelList[output.idx], output.prob);
-    cv::Mat image = imageProcessor.getImage();
-
+    // cv::Mat res_image = imageProcessor.getImage();
     // std::cout << "Label: " << labelList[output.idx] << std::endl;
     // std::cout << "Probability: " << output.prob << std::endl;
 
@@ -92,19 +90,34 @@ int main(int argc, char *argv[])
         "D:\\Personal_Projects\\yolov5\\yolov5s.torchscript",
         ModelName::YOLOV5,
         cv::Size(640, 640),
-        image.size());
+        imageDetProcessor.getSize());
 
-    detPredictor.runInference(imgDetTensor);
+    std::vector<DetResult> res = detPredictor.runInference(imgDetTensor);
+    std::vector<std::string> detLabelList = {};
+    for (auto &i : res)
+    {
+        cv::Rect rect(cv::Point(i.x1, i.y1), cv::Point(i.x2, i.y2));
+        std::cout << "Result: " << std::endl;
+        std::cout << "\tx1: " << i.x1 << std::endl;
+        std::cout << "\ty1: " << i.y1 << std::endl;
+        std::cout << "\tx2: " << i.x2 << std::endl;
+        std::cout << "\ty2: " << i.y2 << std::endl;
+        std::cout << "\tscore: " << i.score << std::endl;
+        std::cout << "\tidx: " << i.idx << std::endl;
+
+        imageDetProcessor.drawBbox(rect, i.idx, i.score, detLabelList);
+    }
+    cv::Mat res_image = imageDetProcessor.getImage();
 
     if (save)
     {
         fs::create_directories(savePath);
         fs::path saveImgPath = fs::path(savePath) / "output.png";
-        cv::imwrite(saveImgPath.string(), image);
+        cv::imwrite(saveImgPath.string(), res_image);
         std::cout << "Saving Image @ " << saveImgPath.string();
     }
 
-    cv::imshow("Demo", image);
+    cv::imshow("Demo", res_image);
     if (cv::waitKey(0) > 0)
     {
         cv::destroyAllWindows();

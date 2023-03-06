@@ -20,7 +20,7 @@ cc_binary(
         "//LTPG/ImageProcessing:ImageProcessor",
         "//LTPG/Models/Classification:Classifier",
         "//LTPG/Models/Detection/Detector",
-        "//LTPG/Models/Detection/Utils:DetUtils",
+        "//LTPG/Utils:Convert",
         "//LTPG/Utils:File",
         "@lib_ARGPARSE//:argparse",
         "@lib_CV//:opencv",

@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//LTPG/Models/Detection/PostProcessor/Abstract:AbstractPostProcessor",
         "//LTPG/Models/Detection/PostProcessor/YoloV5:YOLOV5PostProcessor",
-        "//LTPG/Models/Detection/Utils:DetUtils",
+        "//LTPG/Utils:Convert",
         "@lib_CV//:opencv",
         "@lib_TORCH//:libtorch",
     ],

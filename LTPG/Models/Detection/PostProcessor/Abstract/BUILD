@@ -3,7 +3,7 @@ cc_library(
     hdrs = ["Abstract.hpp"],
     visibility = ["//visibility:public"],
     deps = [
-        "//LTPG/Models/Detection/Utils:DetUtils",
+        "//LTPG/Utils:Convert",
         "@lib_TORCH//:libtorch",
     ],
 )
