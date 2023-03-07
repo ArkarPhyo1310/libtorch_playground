@@ -8,15 +8,10 @@
 #include <torch/torch.h>
 #include <torch/script.h>
 
+#include "LTPG/Utils/DataTypes.hpp"
+
 namespace libtorchPG
 {
-
-    struct ClsResult
-    {
-        int idx;
-        float prob;
-    };
-
     class Classifier
     {
 

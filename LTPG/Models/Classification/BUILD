@@ -4,6 +4,7 @@ cc_library(
     hdrs = ["Classifier.hpp"],
     visibility = ["//visibility:public"],
     deps = [
+        "//LTPG/Utils:DataTypes",
         "@lib_TORCH//:libtorch",
     ],
 )

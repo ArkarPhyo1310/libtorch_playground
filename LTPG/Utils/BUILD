@@ -11,3 +11,10 @@ cc_library(
     hdrs = ["Convert.hpp"],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "DataTypes",
+    srcs = [],
+    hdrs = ["DataTypes.hpp"],
+    visibility = ["//visibility:public"],
+)

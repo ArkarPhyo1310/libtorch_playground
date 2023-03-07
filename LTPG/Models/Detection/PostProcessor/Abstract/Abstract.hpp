@@ -5,27 +5,10 @@
 
 #include <torch/torch.h>
 #include "LTPG/Utils/Convert.hpp"
+#include "LTPG/Utils/DataTypes.hpp"
 
 namespace libtorchPG
 {
-    struct DetResult
-    {
-        float x1;
-        float y1;
-        float x2;
-        float y2;
-        int idx;
-        float score;
-    };
-
-    enum ModelName
-    {
-        YOLOV5,
-        YOLOv7,
-        YOLOv8,
-        YOLOX,
-    };
-
     class AbstractPostProcessor
     {
     protected:

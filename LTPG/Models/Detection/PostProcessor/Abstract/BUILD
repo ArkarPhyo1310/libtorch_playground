@@ -4,6 +4,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//LTPG/Utils:Convert",
+        "//LTPG/Utils:DataTypes",
         "@lib_TORCH//:libtorch",
     ],
 )

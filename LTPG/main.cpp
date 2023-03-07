@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     std::string savePath = argparser.get<std::string>("--save-folder");
 
     bool save = argparser.is_used("--save-folder");
-    
+
     // Classification Part
     // std::vector<std::string> labelList = loadLabels(label);
     // ImageProcessor imageProcessor(path, 224);
@@ -94,20 +94,7 @@ int main(int argc, char *argv[])
 
     std::vector<DetResult> res = detPredictor.runInference(imgDetTensor);
     std::vector<std::string> detLabelList = {};
-    for (auto &i : res)
-    {
-        cv::Rect rect(cv::Point(i.x1, i.y1), cv::Point(i.x2, i.y2));
-        std::cout << "Result: " << std::endl;
-        std::cout << "\tx1: " << i.x1 << std::endl;
-        std::cout << "\ty1: " << i.y1 << std::endl;
-        std::cout << "\tx2: " << i.x2 << std::endl;
-        std::cout << "\ty2: " << i.y2 << std::endl;
-        std::cout << "\tscore: " << i.score << std::endl;
-        std::cout << "\tidx: " << i.idx << std::endl;
-
-        imageDetProcessor.drawBbox(rect, i.idx, i.score, detLabelList);
-    }
-    cv::Mat res_image = imageDetProcessor.getImage();
+    cv::Mat res_image = imageDetProcessor.drawBbox(res, detLabelList);
 
     if (save)
     {

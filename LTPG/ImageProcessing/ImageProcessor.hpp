@@ -10,17 +10,10 @@
 #include <torch/torch.h>
 
 #include "LTPG/Utils/Convert.hpp"
+#include "LTPG/Utils/DataTypes.hpp"
 
 namespace libtorchPG
 {
-
-    enum class CropType
-    {
-        CenterCut,
-        Stretch,
-        LetterBox,
-    };
-
     class ImageProcessor
     {
 
@@ -57,9 +50,9 @@ namespace libtorchPG
 
         torch::Tensor process(CropType type, bool normalize);
 
-        void drawText(const std::string &label, const double prob);
+        cv::Mat drawText(const std::string &label, const double prob);
 
-        void drawBbox(const cv::Rect &rect, const int idx, const double prob, std::vector<std::string> &labelList);
+        cv::Mat drawBbox(std::vector<DetResult> &result, std::vector<std::string> &labelList);
 
         void drawFPS();
     };

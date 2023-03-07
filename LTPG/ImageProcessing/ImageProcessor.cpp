@@ -111,7 +111,7 @@ void ImageProcessor::generateColor()
     }
 }
 
-void ImageProcessor::drawText(const std::string &label, const double prob)
+cv::Mat ImageProcessor::drawText(const std::string &label, const double prob)
 {
     int baseline = 0;
     char text[256];
@@ -132,32 +132,47 @@ void ImageProcessor::drawText(const std::string &label, const double prob)
         cv::Point(0, textSize.height),
         cv::FONT_HERSHEY_SIMPLEX, 0.5,
         cv::Scalar(255, 255, 255), 1);
+    return this->origImg;
 }
 
-void ImageProcessor::drawBbox(const cv::Rect &rect, const int idx, const double prob, std::vector<std::string> &labelList)
+cv::Mat ImageProcessor::drawBbox(std::vector<DetResult> &result, std::vector<std::string> &labelList)
 {
-    int baseline = 0;
-    char text[256];
+    for (auto &i : result)
+    {
+        std::cout << "Result: " << std::endl;
+        std::cout << "\tx1: " << i.x1 << std::endl;
+        std::cout << "\ty1: " << i.y1 << std::endl;
+        std::cout << "\tx2: " << i.x2 << std::endl;
+        std::cout << "\ty2: " << i.y2 << std::endl;
+        std::cout << "\tscore: " << i.score << std::endl;
+        std::cout << "\tidx: " << i.idx << std::endl;
 
-    std::string label = (labelList.size() > 0) ? labelList[idx] : std::to_string(idx);
-    sprintf(text, "%s: %.1f%%", label.c_str(), prob * 100);
+        cv::Rect rect(cv::Point(i.x1, i.y1), cv::Point(i.x2, i.y2));
 
-    cv::Size textSize = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseline);
+        int baseline = 0;
+        char text[256];
 
-    cv::Scalar bboxColor = this->colorList[idx];
-    cv::Scalar textColor = (bboxColor[0] + bboxColor[1] + bboxColor[2]) / 3 > 128 ? cv::Scalar(0, 0, 0) : cv::Scalar(255, 255, 255);
+        std::string label = (labelList.size() > 0) ? labelList[i.idx] : std::to_string(i.idx);
+        sprintf(text, "%s: %.1f%%", label.c_str(), i.score * 100);
 
-    cv::rectangle(this->origImg,
-                  rect, bboxColor, 2);
-    cv::rectangle(this->origImg,
-                  cv::Rect(
-                      rect.tl(),
-                      cv::Size(textSize.width + baseline, textSize.height + baseline)),
-                  bboxColor,
-                  -1);
-    cv::putText(this->origImg,
-                text,
-                cv::Point(rect.tl().x + 2, rect.tl().y + textSize.height),
-                cv::FONT_HERSHEY_SIMPLEX,
-                0.5, textColor);
+        cv::Size textSize = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseline);
+
+        cv::Scalar bboxColor = this->colorList[i.idx];
+        cv::Scalar textColor = (bboxColor[0] + bboxColor[1] + bboxColor[2]) / 3 > 128 ? cv::Scalar(0, 0, 0) : cv::Scalar(255, 255, 255);
+
+        cv::rectangle(this->origImg,
+                      rect, bboxColor, 2);
+        cv::rectangle(this->origImg,
+                      cv::Rect(
+                          rect.tl(),
+                          cv::Size(textSize.width + baseline, textSize.height + baseline)),
+                      bboxColor,
+                      -1);
+        cv::putText(this->origImg,
+                    text,
+                    cv::Point(rect.tl().x + 2, rect.tl().y + textSize.height),
+                    cv::FONT_HERSHEY_SIMPLEX,
+                    0.5, textColor);
+    }
+    return this->origImg;
 }

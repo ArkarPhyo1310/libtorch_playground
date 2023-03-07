@@ -28,11 +28,16 @@ cc_binary(
     ],
 )
 
+filegroup(
+    name = "Assets",
+    srcs = glob(["Resources/assets/**"]),
+)
+
 genrule(
     name = "copy",
-    srcs = ["Resources/data"],
-    outs = ["data"],
-    cmd = "cp -r $< $@",
+    srcs = [":Assets"],
+    outs = ["assets"],
+    cmd = "mkdir -p $(location assets) && cp -r $(SRCS) $(location assets)",
     output_to_bindir = 1,
     visibility = ["//visibility:public"],
 )

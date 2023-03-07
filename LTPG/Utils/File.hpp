@@ -40,7 +40,7 @@ namespace libtorchPG
 
     fs::path getDefault(const fs::path &exePath, const std::string &path)
     {
-        fs::path fullDefaultPath = exePath.parent_path() / fs::path("data") / fs::path(path);
+        fs::path fullDefaultPath = exePath.parent_path() / fs::path("assets") / fs::path(path);
         return fullDefaultPath;
     }
 
