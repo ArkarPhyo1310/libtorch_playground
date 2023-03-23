@@ -4,7 +4,7 @@
 
 This project is aimed for Windows OS. But it should work on Linux environment with teeny tiny changes.
 
-### :skull_and_crossbones: Installation :skull_and_crossbones
+### :skull_and_crossbones: Installation
 
 1. C++17 (must have)
 2. **Bazel**        - For more [info](https://bazel.build/install).
@@ -16,13 +16,13 @@ For installing these packages, please refer to this [page](https://github.com/Ar
 >Note: If you encounter "undefiend error" in linux, try downloading the nightly version of the libtorch without pre-compile.
 >Here is the link to download. [https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-shared-with-deps-latest.zip]
 
-### :package: External Packages :package
+### :package: External Packages
 
 - [argparse](https://github.com/p-ranav/argparse) [![Stars](https://img.shields.io/github/stars/p-ranav/argparse.svg?style=flat&logo=GitHub&logoColor=white&color=blue)](https://github.com/p-ranav/argparse)
 
 - [spdlog](https://github.com/gabime/spdlog) [![Stars](https://img.shields.io/github/stars/gabime/spdlog.svg?style=flat&logo=GitHub&logoColor=white&color=blue)](https://github.com/gabime/spdlog)
 
-### :clipboard: Configuration :clipboard
+### :clipboard: Configuration
 
 Current **config.bzl**.
 
@@ -34,7 +34,7 @@ LIBTORCH_PATH = "D:/Dev_pkgs/pytorch/libtorch" # Add your LIBTORCH Path here
 
 Please update the path accordingly.
 
-### :zap: Usage :zap
+### :zap: Usage
 
 ```cmd
 bazel run //LTPG:main 
