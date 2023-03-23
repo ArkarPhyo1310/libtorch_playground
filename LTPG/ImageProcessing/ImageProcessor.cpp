@@ -139,14 +139,13 @@ cv::Mat ImageProcessor::drawBbox(std::vector<DetResult> &result, std::vector<std
 {
     for (auto &i : result)
     {
-        std::cout << "Result: " << std::endl;
-        std::cout << "\tx1: " << i.x1 << std::endl;
-        std::cout << "\ty1: " << i.y1 << std::endl;
-        std::cout << "\tx2: " << i.x2 << std::endl;
-        std::cout << "\ty2: " << i.y2 << std::endl;
-        std::cout << "\tscore: " << i.score << std::endl;
-        std::cout << "\tidx: " << i.idx << std::endl;
-
+        logger.logInfo("Result: ");
+        logger.logInfo("\tx1: " + std::to_string(i.x1));
+        logger.logInfo("\ty1: " + std::to_string(i.y1));
+        logger.logInfo("\tx2: " + std::to_string(i.x2));
+        logger.logInfo("\ty2: " + std::to_string(i.y2));
+        logger.logInfo("\tscore: " + std::to_string(i.score));
+        logger.logInfo("\tidx: " + std::to_string(i.idx));
         cv::Rect rect(cv::Point(i.x1, i.y1), cv::Point(i.x2, i.y2));
 
         int baseline = 0;

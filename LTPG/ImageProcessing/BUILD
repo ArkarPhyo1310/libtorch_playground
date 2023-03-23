@@ -6,6 +6,7 @@ cc_library(
     deps = [
         "//LTPG/Utils:Convert",
         "//LTPG/Utils:DataTypes",
+        "//LTPG/Utils:Logger",
         "@lib_CV//:opencv",
         "@lib_TORCH//:libtorch",
     ],

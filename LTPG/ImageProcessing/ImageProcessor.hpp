@@ -11,6 +11,7 @@
 
 #include "LTPG/Utils/Convert.hpp"
 #include "LTPG/Utils/DataTypes.hpp"
+#include "LTPG/Utils/Logger.hpp"
 
 namespace libtorchPG
 {
@@ -20,6 +21,7 @@ namespace libtorchPG
     private:
         cv::Mat origImg;
         std::vector<cv::Scalar> colorList;
+        Logger &logger = Logger::getInstance(LogType::InfoLog);
 
         const uint16_t imgSize;
         const std::vector<double> mean = {0.485, 0.456, 0.406};

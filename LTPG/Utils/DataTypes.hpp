@@ -2,7 +2,7 @@
 #define DATATYPES_H
 
 namespace libtorchPG
-{    
+{
     struct ClsResult
     {
         int idx;
@@ -32,6 +32,14 @@ namespace libtorchPG
         YOLOv7,
         YOLOv8,
         YOLOX,
+    };
+
+    enum LogType
+    {
+        InfoLog,
+        ErrorLog,
+        WarnLog,
+        CriticalLog
     };
 } // namespace libtorchPG
 

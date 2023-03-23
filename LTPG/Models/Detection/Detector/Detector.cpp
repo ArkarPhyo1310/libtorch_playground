@@ -21,9 +21,9 @@ Detector::Detector(
         abort();
     }
 
-    std::cout << "Finish loading the model...\n";
+    logger.logInfo("Finish loading the model...");
     torch::jit::setGraphExecutorOptimize(false);
-    std::cout << "Warming up the model...\n";
+    logger.logInfo("Warming up the model...");
     this->model.forward({torch::randn({1, 3, 640, 640})});
 
     switch (modelName)
@@ -43,7 +43,7 @@ Detector::~Detector()
 
 std::vector<DetResult> Detector::runInference(torch::Tensor inputTensor)
 {
-    printf("Starting the inference process... \n");
+    logger.logInfo("Starting the inference process...");
 
     std::vector<torch::jit::IValue> input;
     input.push_back(inputTensor);
@@ -53,7 +53,7 @@ std::vector<DetResult> Detector::runInference(torch::Tensor inputTensor)
     auto endTime = std::chrono::high_resolution_clock::now();
 
     int duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-    printf("Inference Time: %d ms\n", duration);
+    logger.logInfo("Inference Time(ms): " + std::to_string(duration));
 
     std::vector<DetResult> res = this->postProcessor->postProcess(output);
 

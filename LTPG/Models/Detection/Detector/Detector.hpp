@@ -10,6 +10,7 @@
 
 #include "LTPG/Models/Detection/PostProcessor/Abstract/Abstract.hpp"
 #include "LTPG/Models/Detection/PostProcessor/YoloV5/PostProcess.hpp"
+#include "LTPG/Utils/Logger.hpp"
 #include "LTPG/Utils/Convert.hpp"
 
 namespace libtorchPG
@@ -26,6 +27,8 @@ namespace libtorchPG
         std::vector<DetResult> runInference(torch::Tensor input);
 
     private:
+        Logger &logger = Logger::getInstance(LogType::InfoLog);
+
         AbstractPostProcessor *postProcessor = nullptr;
         torch::jit::script::Module model;
         torch::Tensor output;

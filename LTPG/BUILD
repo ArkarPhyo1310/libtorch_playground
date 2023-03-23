@@ -22,6 +22,7 @@ cc_binary(
         "//LTPG/Models/Detection/Detector",
         "//LTPG/Utils:Convert",
         "//LTPG/Utils:File",
+        "//LTPG/Utils:Logger",
         "@lib_ARGPARSE//:argparse",
         "@lib_CV//:opencv",
         "@lib_TORCH//:libtorch",
