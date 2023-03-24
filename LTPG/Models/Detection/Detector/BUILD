@@ -7,6 +7,7 @@ cc_library(
         "//LTPG/Models/Detection/PostProcessor/Abstract:AbstractPostProcessor",
         "//LTPG/Models/Detection/PostProcessor/YoloV5:YOLOV5PostProcessor",
         "//LTPG/Utils:Convert",
+        "//LTPG/Utils:Logger",
         "@lib_CV//:opencv",
         "@lib_TORCH//:libtorch",
     ],

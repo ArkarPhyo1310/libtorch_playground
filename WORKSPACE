@@ -22,3 +22,11 @@ http_archive(
     strip_prefix = "argparse-2.9",
     urls = ["https://github.com/p-ranav/argparse/archive/refs/tags/v2.9.zip"],
 )
+
+http_archive(
+    name = "lib_SPDLOG",
+    build_file = "@libtorchPG//external_pkgs:spdlog.BUILD",
+    sha256 = "33f83c6b86ec0fbbd0eb0f4e980da6767494dc0ad063900bcfae8bc3e9c75f21",
+    strip_prefix = "spdlog-1.11.0",
+    urls = ["https://github.com/gabime/spdlog/archive/refs/tags/v1.11.0.zip"],
+)

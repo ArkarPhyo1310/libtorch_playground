@@ -18,3 +18,14 @@ cc_library(
     hdrs = ["DataTypes.hpp"],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "Logger",
+    srcs = [],
+    hdrs = ["Logger.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//LTPG/Utils:DataTypes",
+        "@lib_SPDLOG//:spdlog",
+    ],
+)

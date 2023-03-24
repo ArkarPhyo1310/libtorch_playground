@@ -14,6 +14,7 @@
 #include "Models/Detection/Detector/Detector.hpp"
 #include "Utils/Convert.hpp"
 #include "Utils/File.hpp"
+#include "Utils/Logger.hpp"
 
 using namespace libtorchPG;
 namespace fs = std::filesystem;
@@ -23,22 +24,29 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
     argparse::ArgumentParser program("LibTorch Playground");
 
     fs::path exePath = getExePath(argv[0]);
-    fs::path imagePath = getDefault(exePath, "D:\\Personal_Projects\\yolov5\\data\\images\\zidane.jpg");
-    fs::path modelPath = getDefault(exePath, "resnet.torchscript");
-    fs::path labelPath = getDefault(exePath, "labels.txt");
+    fs::path imagePath = getDefault(exePath, "test.jpg");
+    fs::path modelPath = getDefault(exePath, "yolov5s.torchscript");
+    fs::path labelPath = getDefault(exePath, "coco.txt");
+    std::string defaultType = "Detection";
 
     program.add_argument("-i", "--image")
         .default_value(imagePath.string())
         .required()
         .help("Specify the image path.");
 
+    program.add_argument("-t", "--type")
+        .default_value(defaultType)
+        .required()
+        .help("Specify the Vision Type ['Classification', 'Detection'].");
+
     program.add_argument("-m", "--model")
         .default_value(modelPath.string())
         .required()
-        .help("Specify the image path.");
+        .help("Specify the model path.");
 
     program.add_argument("-l", "--label")
         .default_value(labelPath.string())
+        .required()
         .help("Specify the label file.");
 
     program.add_argument("-s", "--save-folder")
@@ -61,54 +69,63 @@ argparse::ArgumentParser getOpts(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-
     argparse::ArgumentParser argparser = getOpts(argc, argv);
 
     std::string path = argparser.get<std::string>("--image");
     std::string model = argparser.get<std::string>("--model");
     std::string label = argparser.get<std::string>("--label");
     std::string savePath = argparser.get<std::string>("--save-folder");
+    std::string type = argparser.get<std::string>("--type");
 
     bool save = argparser.is_used("--save-folder");
 
-    // Classification Part
-    // std::vector<std::string> labelList = loadLabels(label);
-    // ImageProcessor imageProcessor(path, 224);
-    // Classifier clsPredictor(model);
-    // torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch, true);
-    // clsPredictor.runInference(imgTensor);
-    // ClsResult output = clsPredictor.getOutput();
-    // imageProcessor.drawText(labelList[output.idx], output.prob);
-    // cv::Mat res_image = imageProcessor.getImage();
-    // std::cout << "Label: " << labelList[output.idx] << std::endl;
-    // std::cout << "Probability: " << output.prob << std::endl;
+    Logger &logger = Logger::getInstance(LogType::InfoLog);
 
-    // Detection Part
-    ImageProcessor imageDetProcessor(path, 640);
-    torch::Tensor imgDetTensor = imageDetProcessor.process(CropType::LetterBox, false);
-    Detector detPredictor(
-        "D:\\Personal_Projects\\yolov5\\yolov5s.torchscript",
-        ModelName::YOLOV5,
-        cv::Size(640, 640),
-        imageDetProcessor.getSize());
+    std::vector<std::string> labelList = loadLabels(label);
+    cv::Mat res_image;
 
-    std::vector<DetResult> res = detPredictor.runInference(imgDetTensor);
-    std::vector<std::string> detLabelList = {};
-    cv::Mat res_image = imageDetProcessor.drawBbox(res, detLabelList);
+    if (type == "Classification")
+    {
+        // Classification Part
+        ImageProcessor imageProcessor(path, 224);
+        Classifier clsPredictor(model);
+        torch::Tensor imgTensor = imageProcessor.process(CropType::Stretch, true);
+        clsPredictor.runInference(imgTensor);
+        ClsResult output = clsPredictor.getOutput();
+        imageProcessor.drawText(labelList[output.idx], output.prob);
+        res_image = imageProcessor.getImage();
+        logger.logInfo("Label: " + labelList[output.idx]);
+        logger.logInfo("Probability: " + std::to_string(output.prob));
+    }
+    else if (type == "Detection")
+    {
+        // Detection Part
+        ImageProcessor imageDetProcessor(path, 640);
+        torch::Tensor imgDetTensor = imageDetProcessor.process(CropType::LetterBox, false);
+        Detector detPredictor(
+            model,
+            ModelName::YOLOV5,
+            cv::Size(640, 640),
+            imageDetProcessor.getSize());
+        std::vector<DetResult> res = detPredictor.runInference(imgDetTensor);
+        res_image = imageDetProcessor.drawBbox(res, labelList);
+    }
+    else
+    {
+        logger.logError("Unknown Model Type['Classification', 'Detection']: " + type);
+        abort();
+    }
 
     if (save)
     {
         fs::create_directories(savePath);
         fs::path saveImgPath = fs::path(savePath) / "output.png";
         cv::imwrite(saveImgPath.string(), res_image);
-        std::cout << "Saving Image @ " << saveImgPath.string();
+        logger.logInfo("Saving Image @ " + saveImgPath.string());
     }
 
-    cv::imshow("Demo", res_image);
-    if (cv::waitKey(0) > 0)
-    {
-        cv::destroyAllWindows();
-    }
+    cv::imshow("LibTorch Playground DEMO", res_image);
+    cv::waitKey(0);
 
     return 0;
 }

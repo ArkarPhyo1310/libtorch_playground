@@ -34,4 +34,4 @@
 bazel-*
 .vscode
 *.pt
-*.torchscript
+*.log

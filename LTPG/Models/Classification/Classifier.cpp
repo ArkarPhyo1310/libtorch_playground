@@ -15,9 +15,9 @@ Classifier::Classifier(const std::string &modelFile)
         abort();
     }
 
-    std::cout << "Finish loading the model...\n";
+    logger.logInfo("Finish loading the model...");
     torch::jit::setGraphExecutorOptimize(false);
-    std::cout << "Warming up model...\n";
+    logger.logInfo("Warming up model...");
     this->model.forward({torch::randn({1, 3, 224, 224})});
 }
 

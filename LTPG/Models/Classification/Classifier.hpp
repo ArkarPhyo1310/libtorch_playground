@@ -9,6 +9,7 @@
 #include <torch/script.h>
 
 #include "LTPG/Utils/DataTypes.hpp"
+#include "LTPG/Utils/Logger.hpp"
 
 namespace libtorchPG
 {
@@ -48,6 +49,7 @@ namespace libtorchPG
         ClsResult getOutput();
 
     private:
+        Logger &logger = Logger::getInstance(LogType::InfoLog);
         torch::jit::script::Module model;
         torch::Tensor output;
     };

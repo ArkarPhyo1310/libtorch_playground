@@ -12,8 +12,3 @@ build:vs2022 --copt=-DWIN32_LEAN_AND_MEAN
 build:vs2022 --copt=-DNOGDI
 build:vs2022 --host_copt=-DWIN32_LEAN_AND_MEAN
 build:vs2022 --host_copt=-DNOGDI
-
-# macOS (e.g. Clang 12.0.0)
-
-build:macos --cxxopt=-std=c++2a
-build:macos --cxxopt=-Wallxopt=-std=c++2a
