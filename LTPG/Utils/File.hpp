@@ -11,7 +11,12 @@ namespace fs = std::filesystem;
 
 namespace libtorchPG
 {
-
+    /**
+     * @brief Load Label txt file
+     * 
+     * @param fileName 
+     * @return std::vector<std::string> 
+     */
     std::vector<std::string> loadLabels(const std::string &fileName)
     {
         std::ifstream ins(fileName);
@@ -33,11 +38,24 @@ namespace libtorchPG
         return labels;
     }
 
+    /**
+     * @brief Get the Exe Path object
+     * 
+     * @param exePath 
+     * @return fs::path 
+     */
     fs::path getExePath(const std::string &exePath)
     {
         return fs::path(exePath);
     }
 
+    /**
+     * @brief Get the Default Path of 'Assets' folder
+     * 
+     * @param exePath 
+     * @param path 
+     * @return fs::path 
+     */
     fs::path getDefault(const fs::path &exePath, const std::string &path)
     {
         fs::path fullDefaultPath = exePath.parent_path() / fs::path("assets") / fs::path(path);
